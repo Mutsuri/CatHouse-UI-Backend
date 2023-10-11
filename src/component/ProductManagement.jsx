@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/BoMerchant';
 import * as XLSX from 'xlsx';
 import { Logout } from '../services/Logout';
+import Swal from 'sweetalert2';
 
 const AddProduct = (props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -404,7 +405,7 @@ const AddProduct = (props) => {
   );
 };
 
-function ExcelFileUploader() {
+function ExcelFileUploader(props) {
   const [data, setData] = useState(null);
   const [file, setFile] = useState(null);
 
@@ -413,16 +414,37 @@ function ExcelFileUploader() {
     setFile(file);
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const workbook = XLSX.read(e.target.result, { type: 'array' });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const excelData = XLSX.utils.sheet_to_json(worksheet, {
           defval: null,
         });
-        setData(excelData);
+
+        const email = sessionStorage.getItem('merchantEmail');
+
+        const dataReq = {
+          email,
+          productList: excelData,
+        };
+
+        await api.addOneNewProduct(dataReq).then((res) => {
+          if (res.data.status) {
+            props.setProductInStore(res.data.productList);
+            Swal.fire({
+              icon: 'success',
+              title: 'Update Successful!.',
+              text: 'your quantity of your product has been updated',
+              showConfirmButton: true, // ไม่แสดงปุ่ม OK ใน SweetAlert2
+              // timer: 1000,
+            });
+          }
+        });
       };
       reader.readAsArrayBuffer(file);
+
+      // console.log(reader.readAsArrayBuffer(file));
     }
   };
 
@@ -1176,7 +1198,7 @@ const ProductManagement = () => {
           >
             <Box
               w="115px"
-              h="100px"
+              h="70px"
               position="relative"
               right="-20px"
               bottom="-10px"
@@ -1539,7 +1561,7 @@ const ProductManagement = () => {
                   key={1}
                   updateProductInStore={updateProductInStore}
                 />
-                <ExcelFileUploader />
+                <ExcelFileUploader setProductInStore={setProductInStore} />
               </Flex>
             </Box>
 

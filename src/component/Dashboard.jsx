@@ -58,6 +58,8 @@ const Login = () => {
       merchantEmail: merchantEmail,
     };
 
+    console.log(dataReq);
+
     api.getDashBoardStats(dataReq).then((res) => {
       if (res.data.status) {
         setMonthProfit(res.data.monthlyProfitResp.totalProfit);

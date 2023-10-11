@@ -26,7 +26,7 @@ import { Checkbox } from '@chakra-ui/react';
 import api from '../services/BoMerchant';
 import { Logout } from '../services/Logout';
 
-const ViewButton = () => {
+const ViewButton = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const modalRef = useRef(null);
 
@@ -105,78 +105,63 @@ const ViewButton = () => {
             </Box>
 
             {/* product 1 */}
-            <Box h="70px" borderBottom="2px solid #E7EEF3" fontSize="16px">
-              <Box h="25px" w="350px">
-                <Text position="relative" right="-18px" bottom="-8px">
-                  GIANT KINGKONG PRO
-                </Text>
-              </Box>
-
-              <Flex display="flex" position="relative">
-                <Box h="40px" w="410px">
+            {props.productList.map((product) => (
+              <Box h="70px" borderBottom="2px solid #E7EEF3" fontSize="16px">
+                <Box h="25px" w="350px">
                   <Text position="relative" right="-18px" bottom="-8px">
-                    ค้อนปอนด์ด้ามไฟเบอร์ รุ่น HA 3009
+                    {product.productDetail.brandName}
                   </Text>
                 </Box>
-                <Box h="40px" w="120px" display="flex" justifyContent="center">
-                  <Text position="relative" bottom="-8px">
-                    3,590
-                  </Text>
-                </Box>
-                <Box h="40px" w="180px" display="flex" justifyContent="center">
-                  <Text position="relative" bottom="-8px">
-                    1
-                  </Text>
-                </Box>
-                <Box h="40px" w="180px" display="flex" justifyContent="center">
-                  <Text position="relative" bottom="-8px">
-                    0
-                  </Text>
-                </Box>
-                <Box h="40px" w="180px" display="flex" justifyContent="center">
-                  <Text position="relative" bottom="-8px">
-                    3,590
-                  </Text>
-                </Box>
-              </Flex>
-            </Box>
 
-            {/* product 2 */}
-            <Box h="70px" borderBottom="2px solid #E7EEF3" fontSize="16px">
-              <Box h="25px" w="350px">
-                <Text position="relative" right="-18px" bottom="-8px">
-                  KINGKONG PRO
-                </Text>
+                <Flex display="flex" position="relative">
+                  <Box h="40px" w="410px">
+                    <Text position="relative" right="-18px" bottom="-8px">
+                      {product.productDetail.productName}
+                    </Text>
+                  </Box>
+                  <Box
+                    h="40px"
+                    w="120px"
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Text position="relative" bottom="-8px">
+                      {product.amount}
+                    </Text>
+                  </Box>
+                  <Box
+                    h="40px"
+                    w="180px"
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Text position="relative" bottom="-8px">
+                      {product.quantity}
+                    </Text>
+                  </Box>
+                  <Box
+                    h="40px"
+                    w="180px"
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Text position="relative" bottom="-8px">
+                      0
+                    </Text>
+                  </Box>
+                  <Box
+                    h="40px"
+                    w="180px"
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Text position="relative" bottom="-8px">
+                      {product.amount}
+                    </Text>
+                  </Box>
+                </Flex>
               </Box>
-
-              <Flex display="flex" position="relative">
-                <Box h="40px" w="410px">
-                  <Text position="relative" right="-18px" bottom="-8px">
-                    ค้อนปอนด์ด้ามไฟเบอร์ รุ่น HA 2001
-                  </Text>
-                </Box>
-                <Box h="40px" w="120px" display="flex" justifyContent="center">
-                  <Text position="relative" bottom="-8px">
-                    590
-                  </Text>
-                </Box>
-                <Box h="40px" w="180px" display="flex" justifyContent="center">
-                  <Text position="relative" bottom="-8px">
-                    1
-                  </Text>
-                </Box>
-                <Box h="40px" w="180px" display="flex" justifyContent="center">
-                  <Text position="relative" bottom="-8px">
-                    0
-                  </Text>
-                </Box>
-                <Box h="40px" w="180px" display="flex" justifyContent="center">
-                  <Text position="relative" bottom="-8px">
-                    590
-                  </Text>
-                </Box>
-              </Flex>
-            </Box>
+            ))}
           </ModalHeader>
           <ModalBody fontFamily={'Kanit, sans-serif'}></ModalBody>
           <ModalFooter fontFamily={'Kanit, sans-serif'}></ModalFooter>
@@ -200,6 +185,7 @@ const PurchaseOrder = () => {
 
     api.getMerchantOrders(dataReq).then((res) => {
       if (res.data.status) {
+        console.log(res.data.orderList);
         setOrderList(res.data.orderList);
       }
     });
@@ -467,7 +453,7 @@ const PurchaseOrder = () => {
                       justifyContent="center"
                     >
                       <Text position="relative" bottom="-8px">
-                        {order.transactionDetail.totalAmount}
+                        {order.totalAmount}
                       </Text>
                     </Box>
                     <Box
@@ -477,7 +463,7 @@ const PurchaseOrder = () => {
                       justifyContent="center"
                       position="relative"
                     >
-                      <ViewButton />
+                      <ViewButton productList={order.productDetail} />
                     </Box>
                     <Box
                       h="40px"
