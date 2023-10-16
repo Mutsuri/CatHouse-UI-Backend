@@ -37,11 +37,11 @@ const ViewButton = (props) => {
     setIsOpen(false);
   };
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
+  // const handleOverlayClick = (event) => {
+  //   if (event.target === event.currentTarget) {
+  //     onClose();
+  //   }
+  // };
 
   return (
     <Box>
@@ -62,7 +62,7 @@ const ViewButton = (props) => {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        onOverlayClick={handleOverlayClick}
+        // onOverlayClick={handleOverlayClick}
         closeOnEsc={false}
       >
         <ModalOverlay />

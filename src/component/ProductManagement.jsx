@@ -37,6 +37,17 @@ const AddProduct = (props) => {
   const [productName, setProductName] = useState(null);
   const [netCost, setNetCost] = useState(0);
   const [price, setPrice] = useState(0);
+  const [feature, setFeature] = useState(null);
+  const [detail, setDetail] = useState(null);
+  const [featureDetail, setFeatureDetail] = useState(null);
+  const [howToUse, setHowToUse] = useState(null);
+  const [suggestion, setSuggestion] = useState(null);
+  const [warning, setWarning] = useState(null);
+  const [material, setMaterial] = useState(-1);
+  const [height, setHeight] = useState(-1);
+  const [width, setWidth] = useState(-1);
+  const [depth, setDepth] = useState(-1);
+  const [size, setSize] = useState(-1);
 
   const onOpen = () => {
     setIsOpen(true);
@@ -46,11 +57,11 @@ const AddProduct = (props) => {
     setIsOpen(false);
   };
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
+  // const handleOverlayClick = (event) => {
+  //   if (event.target === event.currentTarget) {
+  //     onClose();
+  //   }
+  // };
 
   const validateFields = () => {
     if (!brandName) {
@@ -83,6 +94,23 @@ const AddProduct = (props) => {
       return;
     }
 
+    const productDescription = {
+      feature,
+      detail,
+      featureDetail,
+      howToUse,
+      suggestion,
+      warning,
+    };
+
+    const productSpecification = {
+      material,
+      height: Number(height),
+      width: Number(width),
+      depth: Number(depth),
+      size: Number(size),
+    };
+
     const dataReq = {
       email,
       productList: [
@@ -91,6 +119,8 @@ const AddProduct = (props) => {
           productName,
           netCost,
           price,
+          productDescription,
+          productSpecification,
         },
       ],
     };
@@ -98,6 +128,7 @@ const AddProduct = (props) => {
     console.log(dataReq);
 
     api.addOneNewProduct(dataReq).then((res) => {
+      console.log(res.data);
       if (res.data.status) {
         alert(res.data.message);
         props.updateProductInStore(res.data.productList);
@@ -132,7 +163,7 @@ const AddProduct = (props) => {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        onOverlayClick={handleOverlayClick}
+        // onOverlayClick={handleOverlayClick}
         closeOnEsc={false}
       >
         <ModalOverlay />
@@ -217,6 +248,7 @@ const AddProduct = (props) => {
                         rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
                         position="relative"
                         right="-50px"
+                        onChange={(e) => setFeature(e.target.value)}
                       />
                     </Flex>
                     <Box position="relative" bottom="-15px" right="-10px">
@@ -233,6 +265,7 @@ const AddProduct = (props) => {
                           rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
                           position="relative"
                           bottom="-10px"
+                          onChange={(e) => setDetail(e.target.value)}
                         />
                       </Box>
 
@@ -245,6 +278,7 @@ const AddProduct = (props) => {
                           rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
                           position="relative"
                           bottom="-10px"
+                          onChange={(e) => setFeatureDetail(e.target.value)}
                         />
                       </Box>
 
@@ -257,6 +291,7 @@ const AddProduct = (props) => {
                           rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
                           position="relative"
                           bottom="-10px"
+                          onChange={(e) => setHowToUse(e.target.value)}
                         />
                       </Box>
                     </Flex>
@@ -270,6 +305,7 @@ const AddProduct = (props) => {
                           rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
                           position="relative"
                           bottom="-10px"
+                          onChange={(e) => setSuggestion(e.target.value)}
                         />
                       </Box>
 
@@ -282,6 +318,7 @@ const AddProduct = (props) => {
                           rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
                           position="relative"
                           bottom="-10px"
+                          onChange={(e) => setWarning(e.target.value)}
                         />
                       </Box>
                     </Flex>
@@ -312,6 +349,7 @@ const AddProduct = (props) => {
                     placeholder="วัสดุหลัก"
                     focusBorderColor="#0F63E9"
                     _hover={{ borderColor: '#0F63E9' }}
+                    onChange={(e) => setMaterial(e.target.value)}
                   />
                   <Input
                     htmlSize={32}
@@ -322,6 +360,7 @@ const AddProduct = (props) => {
                     placeholder="ความสูง (ซม.)"
                     focusBorderColor="#0F63E9"
                     _hover={{ borderColor: '#0F63E9' }}
+                    onChange={(e) => setHeight(e.target.value)}
                   />
                   <Input
                     htmlSize={32}
@@ -332,6 +371,7 @@ const AddProduct = (props) => {
                     placeholder="ความกว้าง (ซม.)"
                     focusBorderColor="#0F63E9"
                     _hover={{ borderColor: '#0F63E9' }}
+                    onChange={(e) => setWidth(e.target.value)}
                   />
                   <Input
                     htmlSize={32}
@@ -342,6 +382,7 @@ const AddProduct = (props) => {
                     placeholder="ความลึก (ซม.)"
                     focusBorderColor="#0F63E9"
                     _hover={{ borderColor: '#0F63E9' }}
+                    onChange={(e) => setDepth(e.target.value)}
                   />
                   <Input
                     htmlSize={32}
@@ -352,6 +393,7 @@ const AddProduct = (props) => {
                     placeholder="ขนาดสินค้า (นิ้ว)"
                     focusBorderColor="#0F63E9"
                     _hover={{ borderColor: '#0F63E9' }}
+                    onChange={(e) => setSize(e.target.value)}
                   />
                 </Box>
               </Box>
@@ -412,6 +454,9 @@ function ExcelFileUploader(props) {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     setFile(file);
+
+    console.log(file);
+
     if (file) {
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -421,6 +466,8 @@ function ExcelFileUploader(props) {
         const excelData = XLSX.utils.sheet_to_json(worksheet, {
           defval: null,
         });
+
+        console.log(excelData);
 
         const email = sessionStorage.getItem('merchantEmail');
 
@@ -443,9 +490,11 @@ function ExcelFileUploader(props) {
         });
       };
       reader.readAsArrayBuffer(file);
-
-      // console.log(reader.readAsArrayBuffer(file));
     }
+
+    // reset file
+    e.target.value = null;
+    return;
   };
 
   return (
@@ -453,7 +502,7 @@ function ExcelFileUploader(props) {
       <input
         type="file"
         accept=".xlsx, .xls"
-        onChange={handleFileUpload}
+        onChange={(e) => handleFileUpload(e)}
         style={{ display: 'none' }}
         id="file-upload"
         // onChange={(e) => setData(e.target.files[0])}
@@ -502,11 +551,11 @@ const ViewAndEditButton = () => {
     setIsOpen(false);
   };
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
+  // const handleOverlayClick = (event) => {
+  //   if (event.target === event.currentTarget) {
+  //     onClose();
+  //   }
+  // };
 
   return (
     <Box>
@@ -527,7 +576,7 @@ const ViewAndEditButton = () => {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        onOverlayClick={handleOverlayClick}
+        // onOverlayClick={handleOverlayClick}
         closeOnEsc={false}
       >
         <ModalOverlay />
@@ -849,11 +898,11 @@ const ProductManagement = () => {
     setIsOpen(false);
   };
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
+  // const handleOverlayClick = (event) => {
+  //   if (event.target === event.currentTarget) {
+  //     onClose();
+  //   }
+  // };
 
   // สร้างสถานะสำหรับรายการผลิตภัณฑ์
   const [products, setProducts] = useState([]);
@@ -883,10 +932,10 @@ const ProductManagement = () => {
   const [productdetailPrecaution, setProductdetailPrecaution] = useState('');
   //ข้อมูลจำเพาะ
   const [productmainmaterial, setProductmainmateria] = useState(''); //วัสดุ
-  const [productheight, setProductheight] = useState('');
-  const [productwidth, setProductwidth] = useState('');
-  const [productdepth, setProductdepth] = useState('');
-  const [productsize, setProductsize] = useState('');
+  const [productheight, setProductheight] = useState(-1);
+  const [productwidth, setProductwidth] = useState(-1);
+  const [productdepth, setProductdepth] = useState(-1);
+  const [productsize, setProductsize] = useState(-1);
   // เปิด Modal เพิ่มผลิตภัณฑ์
   const openAddProductModal = () => {
     setIsAddProductModalOpen(true);
@@ -957,20 +1006,22 @@ const ProductManagement = () => {
   const openEditProductModal = (product) => {
     setEditProduct(product);
     // ตั้งค่าค่าเริ่มต้นของ productName และ productPrice เพื่อแสดงค่าเดิม
-    setProductName(product.name);
+    setProductName(product.productName);
     setProductPrice(product.price);
-    setProductbrand(product.brand);
-    setProductfeature(product.feature);
-    setdetails(product.details);
-    setProductdetproductdetailsfeature(product.detailsfeature);
-    setProductdeproductdetailshowtouse(product.detailshowtouse);
-    setProductdetailinstructions(product.detailinstructions);
-    setProductdetailPrecaution(product.detailPrecaution);
-    setProductmainmateria(product.mainmaterial);
-    setProductheight(product.height);
-    setProductwidth(product.width);
-    setProductdepth(product.depth);
-    setProductsize(product.size);
+    setProductbrand(product.brandName);
+    setProductfeature(product.productDescription?.feature);
+    setdetails(product.productDescription?.detail);
+    setProductdetproductdetailsfeature(
+      product.productDescription?.featureDetail
+    );
+    setProductdeproductdetailshowtouse(product.productDescription?.howToUse);
+    setProductdetailinstructions(product.productDescription?.suggestion);
+    setProductdetailPrecaution(product.productDescription?.warning);
+    setProductmainmateria(product.productSpecification?.material);
+    setProductheight(product.productSpecification?.height);
+    setProductwidth(product.productSpecification?.width);
+    setProductdepth(product.productSpecification?.depth);
+    setProductsize(product.productSpecification?.size);
   };
 
   // ปิด Modal แก้ไขผลิตภัณฑ์
@@ -1607,7 +1658,7 @@ const ProductManagement = () => {
               bottom="-20px"
             >
               {productInStore.map((product, index) => (
-                <Box h="40px" borderBottom="2px solid #E7EEF3">
+                <Box h="40px" borderBottom="2px solid #E7EEF3" key={index}>
                   <Flex display="flex" position="relative">
                     <Box
                       h="40px"
@@ -1675,7 +1726,7 @@ const ProductManagement = () => {
                         <Modal
                           isOpen={!!editProduct}
                           onClose={closeEditProductModal}
-                          onOverlayClick={handleOverlayClick}
+                          // onOverlayClick={handleOverlayClick}
                           closeOnEsc={false}
                         >
                           <ModalOverlay />
@@ -1951,7 +2002,11 @@ const ProductManagement = () => {
                                     <Input
                                       readOnly
                                       htmlSize={32}
-                                      value={productwidth}
+                                      value={
+                                        productwidth == -1
+                                          ? undefined
+                                          : productwidth
+                                      }
                                       position="relative"
                                       bottom="-20px"
                                       right="-20px"
@@ -1966,7 +2021,11 @@ const ProductManagement = () => {
                                     <Input
                                       readOnly
                                       htmlSize={32}
-                                      value={productheight}
+                                      value={
+                                        productheight == -1
+                                          ? undefined
+                                          : productheight
+                                      }
                                       position="relative"
                                       bottom="-30px"
                                       right="-20px"
@@ -1981,7 +2040,11 @@ const ProductManagement = () => {
                                     <Input
                                       readOnly
                                       htmlSize={32}
-                                      value={productdepth}
+                                      value={
+                                        productdepth == -1
+                                          ? undefined
+                                          : productdepth
+                                      }
                                       position="relative"
                                       bottom="-40px"
                                       right="-20px"
@@ -1996,7 +2059,11 @@ const ProductManagement = () => {
                                     <Input
                                       readOnly
                                       htmlSize={32}
-                                      value={productsize}
+                                      value={
+                                        productsize == -1
+                                          ? undefined
+                                          : productsize
+                                      }
                                       position="relative"
                                       bottom="-50px"
                                       right="-20px"

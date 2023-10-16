@@ -25,6 +25,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Checkbox } from '@chakra-ui/react';
 import api from '../services/BoMerchant';
 import { Logout } from '../services/Logout';
+import Swal from 'sweetalert2';
 
 const ViewButton = (props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,11 +39,11 @@ const ViewButton = (props) => {
     setIsOpen(false);
   };
 
-  const handleOverlayClick = (event) => {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  };
+  // const handleOverlayClick = (event) => {
+  //   if (event.target === event.currentTarget) {
+  //     onClose();
+  //   }
+  // };
 
   return (
     <Box>
@@ -63,7 +64,7 @@ const ViewButton = (props) => {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        onOverlayClick={handleOverlayClick}
+        // onOverlayClick={(e) => handleOverlayClick(e)}
         closeOnEsc={false}
       >
         <ModalOverlay />
@@ -105,8 +106,13 @@ const ViewButton = (props) => {
             </Box>
 
             {/* product 1 */}
-            {props.productList.map((product) => (
-              <Box h="70px" borderBottom="2px solid #E7EEF3" fontSize="16px">
+            {props.productList.map((product, index) => (
+              <Box
+                h="70px"
+                borderBottom="2px solid #E7EEF3"
+                fontSize="16px"
+                key={index}
+              >
                 <Box h="25px" w="350px">
                   <Text position="relative" right="-18px" bottom="-8px">
                     {product.productDetail.brandName}
@@ -177,6 +183,10 @@ const PurchaseOrder = () => {
   const nav = useNavigate();
 
   useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = () => {
     const merchantEmail = sessionStorage.getItem('merchantEmail');
 
     const dataReq = {
@@ -185,15 +195,40 @@ const PurchaseOrder = () => {
 
     api.getMerchantOrders(dataReq).then((res) => {
       if (res.data.status) {
-        console.log(res.data.orderList);
         setOrderList(res.data.orderList);
       }
     });
-  }, []);
+  };
 
   const handleLogout = () => {
     Logout();
     nav('/');
+  };
+
+  const handleCheckBox = async (status, index) => {
+    if (status) {
+      const result = await Swal.fire({
+        title: 'ยีนยันการเปลี่ยนสถานะของออเดอร์',
+        showDenyButton: true,
+        // showCancelButton: true,
+        confirmButtonText: 'Save',
+        denyButtonText: `Don't save`,
+      });
+
+      if (result.isConfirmed) {
+        const dataReq = {
+          orderIdList: orderList[index]._id,
+        };
+
+        api.updateStatusOfOrder(dataReq).then((res) => {
+          if (res.data.status) {
+            fetchOrders();
+          }
+        });
+
+        Swal.fire('Saved!', '', 'success');
+      }
+    }
   };
 
   return (
@@ -471,7 +506,25 @@ const PurchaseOrder = () => {
                       display="flex"
                       justifyContent="center"
                     >
-                      <Checkbox colorScheme="green">แพ็คแล้ว</Checkbox>
+                      {order.productDetail[0].status == 'prepared' ? (
+                        <Checkbox
+                          colorScheme="green"
+                          onChange={(e) =>
+                            handleCheckBox(e.target.checked, index)
+                          }
+                          isChecked={false}
+                        >
+                          แพ็คแล้ว
+                        </Checkbox>
+                      ) : (
+                        <Checkbox
+                          colorScheme="green"
+                          isChecked={true}
+                          isDisabled
+                        >
+                          แพ็คแล้ว
+                        </Checkbox>
+                      )}
                     </Box>
                   </Flex>
                 </Box>

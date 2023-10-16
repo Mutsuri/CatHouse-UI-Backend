@@ -16,9 +16,14 @@ const addOneNewProduct = (data) => {
   return server.post('merchant/add_stock_product', data);
 };
 
+const updateStatusOfOrder = (data) => {
+  return server.post('merchant/update_packed_order', data);
+};
+
 export default {
   getDashBoardStats,
   getWareHouseHistory,
   getMerchantOrders,
   addOneNewProduct,
+  updateStatusOfOrder,
 };
