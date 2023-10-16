@@ -868,18 +868,22 @@ const ProductManagement = () => {
   const nav = useNavigate();
 
   useEffect(() => {
+    fetchProduct();
+  }, []);
+
+  const fetchProduct = () => {
     const email = sessionStorage.getItem('merchantEmail');
 
     const dataReq = {
       email,
     };
 
-    api.getWareHouseHistory(dataReq).then((res) => {
+    api.getManagingProduct(dataReq).then((res) => {
       if (res.data.status) {
         setProductInStore(res.data.productList);
       }
     });
-  }, []);
+  };
 
   const updateProductInStore = (productInStore) => {
     setProductInStore(productInStore);
@@ -1085,11 +1089,18 @@ const ProductManagement = () => {
   };
 
   // ลบผลิตภัณฑ์
-  const deleteProduct = (productToDelete) => {
-    setProducts(
-      products.filter((product) => product.id !== productToDelete.id)
-    );
-    closeDeleteProductModal();
+  const deleteProduct = (productId) => {
+    const dataReq = {
+      productId,
+    };
+
+    api.delProduct(dataReq).then((res) => {
+      if (res.data.status) {
+        closeEditProductModal();
+        Swal.fire(res.data.message);
+        fetchProduct();
+      }
+    });
   };
 
   return (
@@ -1657,456 +1668,478 @@ const ProductManagement = () => {
               right="-32px"
               bottom="-20px"
             >
-              {productInStore.map((product, index) => (
-                <Box h="40px" borderBottom="2px solid #E7EEF3" key={index}>
-                  <Flex display="flex" position="relative">
-                    <Box
-                      h="40px"
-                      w="80px"
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Text position="relative" bottom="-8px">
-                        {index + 1}
-                      </Text>
-                    </Box>
-                    <Box h="40px" w="220px">
-                      <Text position="relative" right="-15px" bottom="-8px">
-                        {product.brandName}
-                      </Text>
-                    </Box>
-                    <Box h="40px" w="710px">
-                      <Text position="relative" right="-15px" bottom="-8px">
-                        {product.productName}
-                      </Text>
-                    </Box>
-                    <Box
-                      h="40px"
-                      w="100px"
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Text position="relative" bottom="-8px">
-                        {product.price}
-                      </Text>
-                    </Box>
-                    <Box
-                      h="40px"
-                      w="200px"
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Text position="relative" bottom="-8px">
-                        {product.quantity}
-                      </Text>
-                    </Box>
-                    <Box
-                      h="40px"
-                      w="100px"
-                      display="flex"
-                      justifyContent="center"
-                      position="relative"
-                      right="-40px"
-                    >
-                      <Box>
-                        <Button
-                          onClick={() => openEditProductModal(product)}
-                          w="40px"
-                          h="35px"
-                          position="relative"
-                          bottom="-2px"
-                          border="2px solid #564DE6"
-                          borderRadius="8px"
-                          bg="white"
-                          p={0}
-                          _hover={{ boxShadow: '0 5px 10px rgba(0, 0, 0, .1)' }}
-                        >
-                          <Image src={view} alt="Image 2" w="25px" h="25px" />
-                        </Button>
-                        <Modal
-                          isOpen={!!editProduct}
-                          onClose={closeEditProductModal}
-                          // onOverlayClick={handleOverlayClick}
-                          closeOnEsc={false}
-                        >
-                          <ModalOverlay />
-                          <ModalContent
-                            maxW="980px"
-                            w="100%"
-                            maxH="620px"
-                            h="100%"
+              {productInStore ? (
+                productInStore.map((product, index) => (
+                  <Box h="40px" borderBottom="2px solid #E7EEF3" key={index}>
+                    <Flex display="flex" position="relative">
+                      <Box
+                        h="40px"
+                        w="80px"
+                        display="flex"
+                        justifyContent="center"
+                      >
+                        <Text position="relative" bottom="-8px">
+                          {index + 1}
+                        </Text>
+                      </Box>
+                      <Box h="40px" w="220px">
+                        <Text position="relative" right="-15px" bottom="-8px">
+                          {product.brandName}
+                        </Text>
+                      </Box>
+                      <Box h="40px" w="710px">
+                        <Text position="relative" right="-15px" bottom="-8px">
+                          {product.productName}
+                        </Text>
+                      </Box>
+                      <Box
+                        h="40px"
+                        w="100px"
+                        display="flex"
+                        justifyContent="center"
+                      >
+                        <Text position="relative" bottom="-8px">
+                          {product.price}
+                        </Text>
+                      </Box>
+                      <Box
+                        h="40px"
+                        w="200px"
+                        display="flex"
+                        justifyContent="center"
+                      >
+                        <Text position="relative" bottom="-8px">
+                          {product.quantity}
+                        </Text>
+                      </Box>
+                      <Box
+                        h="40px"
+                        w="100px"
+                        display="flex"
+                        justifyContent="center"
+                        position="relative"
+                        right="-40px"
+                      >
+                        <Box>
+                          <Button
+                            onClick={() => openEditProductModal(product)}
+                            w="40px"
+                            h="35px"
+                            position="relative"
+                            bottom="-2px"
+                            border="2px solid #564DE6"
+                            borderRadius="8px"
+                            bg="white"
+                            p={0}
+                            _hover={{
+                              boxShadow: '0 5px 10px rgba(0, 0, 0, .1)',
+                            }}
                           >
-                            <ModalHeader></ModalHeader>
-                            <ModalBody fontFamily={'Kanit, sans-serif'}>
-                              <Flex>
-                                <Box>
-                                  <Box
-                                    w="700px"
-                                    h="45px"
-                                    position="relative"
-                                    top="-10px"
-                                  >
+                            <Image src={view} alt="Image 2" w="25px" h="25px" />
+                          </Button>
+                          <Modal
+                            isOpen={!!editProduct}
+                            onClose={closeEditProductModal}
+                            // onOverlayClick={handleOverlayClick}
+                            closeOnEsc={false}
+                          >
+                            <ModalOverlay />
+                            <ModalContent
+                              maxW="980px"
+                              w="100%"
+                              maxH="620px"
+                              h="100%"
+                            >
+                              <ModalHeader></ModalHeader>
+                              <ModalBody fontFamily={'Kanit, sans-serif'}>
+                                <Flex>
+                                  <Box>
                                     <Box
-                                      fontWeight="bold"
-                                      fontSize="18"
+                                      w="700px"
+                                      h="45px"
                                       position="relative"
-                                      right="-10px"
-                                      top="-8px"
-                                    >
-                                      แก้ไขสินค้า
-                                    </Box>
-                                    <Box
-                                      fontSize="14"
-                                      position="relative"
-                                      right="-40px"
                                       top="-10px"
                                     >
-                                      แก้ไขสินค้าในคลัง
+                                      <Box
+                                        fontWeight="bold"
+                                        fontSize="18"
+                                        position="relative"
+                                        right="-10px"
+                                        top="-8px"
+                                      >
+                                        แก้ไขสินค้า
+                                      </Box>
+                                      <Box
+                                        fontSize="14"
+                                        position="relative"
+                                        right="-40px"
+                                        top="-10px"
+                                      >
+                                        แก้ไขสินค้าในคลัง
+                                      </Box>
                                     </Box>
-                                  </Box>
-                                  <Box w="700px" h="500px" position="relative">
-                                    <Box>
-                                      <Flex h="100%">
-                                        <Box>
-                                          <InputGroup
+                                    <Box
+                                      w="700px"
+                                      h="500px"
+                                      position="relative"
+                                    >
+                                      <Box>
+                                        <Flex h="100%">
+                                          <Box>
+                                            <InputGroup
+                                              position="relative"
+                                              right="-30px"
+                                            >
+                                              <Input
+                                                readOnly
+                                                htmlSize={32}
+                                                value={productbrand}
+                                                width="200px"
+                                                placeholder="ยี่ห้อ"
+                                                focusBorderColor="#0F63E9"
+                                                _hover={{
+                                                  borderColor: '#0F63E9',
+                                                }}
+                                                onChange={(e) =>
+                                                  setProductbrand(
+                                                    e.target.value
+                                                  )
+                                                }
+                                              />
+                                            </InputGroup>
+                                            <InputGroup
+                                              position="relative"
+                                              bottom="-10px"
+                                              right="-30px"
+                                            >
+                                              <Input
+                                                readOnly
+                                                htmlSize={32}
+                                                value={productName}
+                                                width="200px"
+                                                placeholder="ชื่อสินค้า"
+                                                focusBorderColor="#0F63E9"
+                                                _hover={{
+                                                  borderColor: '#0F63E9',
+                                                }}
+                                                onChange={(e) =>
+                                                  setProductName(e.target.value)
+                                                }
+                                              />
+                                            </InputGroup>
+                                            <InputGroup
+                                              position="relative"
+                                              bottom="-20px"
+                                              right="-30px"
+                                            >
+                                              <Input
+                                                htmlSize={32}
+                                                value={productPrice}
+                                                width="200px"
+                                                placeholder="ราคา"
+                                                focusBorderColor="#0F63E9"
+                                                _hover={{
+                                                  borderColor: '#0F63E9',
+                                                }}
+                                                onChange={(e) =>
+                                                  setProductPrice(
+                                                    e.target.value
+                                                  )
+                                                }
+                                              />
+                                            </InputGroup>
+                                          </Box>
+                                          <Textarea
+                                            readOnly
+                                            placeholder="คุณสมบัติโดยรวม"
+                                            value={productfeature}
+                                            w="420px"
+                                            h="140px"
+                                            resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
+                                            rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
                                             position="relative"
-                                            right="-30px"
-                                          >
-                                            <Input
-                                              readOnly
-                                              htmlSize={32}
-                                              value={productbrand}
-                                              width="200px"
-                                              placeholder="ยี่ห้อ"
-                                              focusBorderColor="#0F63E9"
-                                              _hover={{
-                                                borderColor: '#0F63E9',
-                                              }}
-                                              onChange={(e) =>
-                                                setProductbrand(e.target.value)
-                                              }
-                                            />
-                                          </InputGroup>
-                                          <InputGroup
-                                            position="relative"
-                                            bottom="-10px"
-                                            right="-30px"
-                                          >
-                                            <Input
-                                              readOnly
-                                              htmlSize={32}
-                                              value={productName}
-                                              width="200px"
-                                              placeholder="ชื่อสินค้า"
-                                              focusBorderColor="#0F63E9"
-                                              _hover={{
-                                                borderColor: '#0F63E9',
-                                              }}
-                                              onChange={(e) =>
-                                                setProductName(e.target.value)
-                                              }
-                                            />
-                                          </InputGroup>
-                                          <InputGroup
+                                            right="-50px"
+                                            onChange={(e) =>
+                                              setProductfeature(e.target.value)
+                                            }
+                                          />
+                                        </Flex>
+                                        <Box
+                                          position="relative"
+                                          bottom="-15px"
+                                          right="-10px"
+                                        >
+                                          <Text>รายละเอียดสินค้า</Text>
+                                        </Box>
+
+                                        <Flex position="relative" right="-30px">
+                                          <Box
                                             position="relative"
                                             bottom="-20px"
-                                            right="-30px"
                                           >
-                                            <Input
-                                              htmlSize={32}
-                                              value={productPrice}
-                                              width="200px"
-                                              placeholder="ราคา"
-                                              focusBorderColor="#0F63E9"
-                                              _hover={{
-                                                borderColor: '#0F63E9',
+                                            <Textarea
+                                              readOnly
+                                              placeholder="รายละเอียดสินค้า"
+                                              value={productdetails}
+                                              w="200px"
+                                              h="140px"
+                                              resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
+                                              rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
+                                              position="relative"
+                                              bottom="-10px"
+                                              onChange={(e) => {
+                                                setdetails(e.target.value);
                                               }}
-                                              onChange={(e) =>
-                                                setProductPrice(e.target.value)
-                                              }
                                             />
-                                          </InputGroup>
-                                        </Box>
-                                        <Textarea
-                                          readOnly
-                                          placeholder="คุณสมบัติโดยรวม"
-                                          value={productfeature}
-                                          w="420px"
-                                          h="140px"
-                                          resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
-                                          rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
+                                          </Box>
+
+                                          <Box
+                                            position="relative"
+                                            bottom="-20px"
+                                            right="-20px"
+                                          >
+                                            <Textarea
+                                              readOnly
+                                              placeholder="รายละเอียดคุณสมบัติ"
+                                              value={productdetailsfeature}
+                                              w="200px"
+                                              h="140px"
+                                              resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
+                                              rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
+                                              position="relative"
+                                              bottom="-10px"
+                                              onChange={(e) => {
+                                                setProductdetproductdetailsfeature(
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                          </Box>
+
+                                          <Box
+                                            position="relative"
+                                            bottom="-20px"
+                                            right="-40px"
+                                          >
+                                            <Textarea
+                                              readOnly
+                                              placeholder="รายละเอียดวิธีใช้งาน"
+                                              value={productdetailshowtouse}
+                                              w="200px"
+                                              h="140px"
+                                              resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
+                                              rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
+                                              position="relative"
+                                              bottom="-10px"
+                                              onChange={(e) => {
+                                                setProductdeproductdetailshowtouse(
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                          </Box>
+                                        </Flex>
+                                        <Flex
                                           position="relative"
-                                          right="-50px"
-                                          onChange={(e) =>
-                                            setProductfeature(e.target.value)
-                                          }
-                                        />
-                                      </Flex>
-                                      <Box
-                                        position="relative"
-                                        bottom="-15px"
-                                        right="-10px"
-                                      >
-                                        <Text>รายละเอียดสินค้า</Text>
+                                          right="-30px"
+                                          bottom="-20px"
+                                        >
+                                          <Box
+                                            position="relative"
+                                            bottom="-20px"
+                                          >
+                                            <Textarea
+                                              readOnly
+                                              placeholder="รายละเอียดคำแนะนำ"
+                                              value={productdetailinstructions}
+                                              w="200px"
+                                              h="140px"
+                                              resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
+                                              rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
+                                              position="relative"
+                                              bottom="-10px"
+                                              onChange={(e) => {
+                                                setProductdetailinstructions(
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                          </Box>
+
+                                          <Box
+                                            position="relative"
+                                            bottom="-20px"
+                                            right="-20px"
+                                          >
+                                            <Textarea
+                                              readOnly
+                                              placeholder="รายละเอียดข้อควรระวัง"
+                                              value={productdetailPrecaution}
+                                              w="200px"
+                                              h="140px"
+                                              resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
+                                              rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
+                                              position="relative"
+                                              bottom="-10px"
+                                              onChange={(e) => {
+                                                setProductdetailPrecaution(
+                                                  e.target.value
+                                                );
+                                              }}
+                                            />
+                                          </Box>
+                                        </Flex>
                                       </Box>
-
-                                      <Flex position="relative" right="-30px">
-                                        <Box position="relative" bottom="-20px">
-                                          <Textarea
-                                            readOnly
-                                            placeholder="รายละเอียดสินค้า"
-                                            value={productdetails}
-                                            w="200px"
-                                            h="140px"
-                                            resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
-                                            rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
-                                            position="relative"
-                                            bottom="-10px"
-                                            onChange={(e) => {
-                                              setdetails(e.target.value);
-                                            }}
-                                          />
-                                        </Box>
-
-                                        <Box
-                                          position="relative"
-                                          bottom="-20px"
-                                          right="-20px"
-                                        >
-                                          <Textarea
-                                            readOnly
-                                            placeholder="รายละเอียดคุณสมบัติ"
-                                            value={productdetailsfeature}
-                                            w="200px"
-                                            h="140px"
-                                            resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
-                                            rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
-                                            position="relative"
-                                            bottom="-10px"
-                                            onChange={(e) => {
-                                              setProductdetproductdetailsfeature(
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                        </Box>
-
-                                        <Box
-                                          position="relative"
-                                          bottom="-20px"
-                                          right="-40px"
-                                        >
-                                          <Textarea
-                                            readOnly
-                                            placeholder="รายละเอียดวิธีใช้งาน"
-                                            value={productdetailshowtouse}
-                                            w="200px"
-                                            h="140px"
-                                            resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
-                                            rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
-                                            position="relative"
-                                            bottom="-10px"
-                                            onChange={(e) => {
-                                              setProductdeproductdetailshowtouse(
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                        </Box>
-                                      </Flex>
-                                      <Flex
-                                        position="relative"
-                                        right="-30px"
-                                        bottom="-20px"
-                                      >
-                                        <Box position="relative" bottom="-20px">
-                                          <Textarea
-                                            readOnly
-                                            placeholder="รายละเอียดคำแนะนำ"
-                                            value={productdetailinstructions}
-                                            w="200px"
-                                            h="140px"
-                                            resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
-                                            rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
-                                            position="relative"
-                                            bottom="-10px"
-                                            onChange={(e) => {
-                                              setProductdetailinstructions(
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                        </Box>
-
-                                        <Box
-                                          position="relative"
-                                          bottom="-20px"
-                                          right="-20px"
-                                        >
-                                          <Textarea
-                                            readOnly
-                                            placeholder="รายละเอียดข้อควรระวัง"
-                                            value={productdetailPrecaution}
-                                            w="200px"
-                                            h="140px"
-                                            resize="vertical" // ช่วยให้ Textarea สามารถปรับขนาดตามเนื้อหา
-                                            rows={4} // จำนวนบรรทัดเริ่มต้น (ปรับตามความต้องการ)
-                                            position="relative"
-                                            bottom="-10px"
-                                            onChange={(e) => {
-                                              setProductdetailPrecaution(
-                                                e.target.value
-                                              );
-                                            }}
-                                          />
-                                        </Box>
-                                      </Flex>
                                     </Box>
                                   </Box>
-                                </Box>
 
-                                <Box w="300px" h="500px">
-                                  <Box position="relative" bottom="-10px">
-                                    <Text>ข้อมูลจำเพาะ</Text>
+                                  <Box w="300px" h="500px">
+                                    <Box position="relative" bottom="-10px">
+                                      <Text>ข้อมูลจำเพาะ</Text>
+                                    </Box>
+                                    <Box position="relative" bottom="-20px">
+                                      <Input
+                                        readOnly
+                                        htmlSize={32}
+                                        value={productbrand}
+                                        position="relative"
+                                        right="-20px"
+                                        width="200px"
+                                        placeholder="แบรนด์"
+                                        focusBorderColor="#0F63E9"
+                                        _hover={{ borderColor: '#0F63E9' }}
+                                        onChange={(e) =>
+                                          setProductbrand(e.target.value)
+                                        }
+                                      />
+                                      <Input
+                                        readOnly
+                                        htmlSize={32}
+                                        value={productmainmaterial}
+                                        position="relative"
+                                        bottom="-10px"
+                                        right="-20px"
+                                        width="200px"
+                                        placeholder="วัสดุหลัก"
+                                        focusBorderColor="#0F63E9"
+                                        _hover={{ borderColor: '#0F63E9' }}
+                                        onChange={(e) => {
+                                          setProductmainmateria(e.target.value);
+                                        }}
+                                      />
+                                      <Input
+                                        readOnly
+                                        htmlSize={32}
+                                        value={
+                                          productwidth == -1
+                                            ? undefined
+                                            : productwidth
+                                        }
+                                        position="relative"
+                                        bottom="-20px"
+                                        right="-20px"
+                                        width="200px"
+                                        placeholder="ความสูง (ซม.)"
+                                        focusBorderColor="#0F63E9"
+                                        _hover={{ borderColor: '#0F63E9' }}
+                                        onChange={(e) => {
+                                          setProductwidth(e.target.value);
+                                        }}
+                                      />
+                                      <Input
+                                        readOnly
+                                        htmlSize={32}
+                                        value={
+                                          productheight == -1
+                                            ? undefined
+                                            : productheight
+                                        }
+                                        position="relative"
+                                        bottom="-30px"
+                                        right="-20px"
+                                        width="200px"
+                                        placeholder="ความกว้าง (ซม.)"
+                                        focusBorderColor="#0F63E9"
+                                        _hover={{ borderColor: '#0F63E9' }}
+                                        onChange={(e) => {
+                                          setProductheight(e.target.value);
+                                        }}
+                                      />
+                                      <Input
+                                        readOnly
+                                        htmlSize={32}
+                                        value={
+                                          productdepth == -1
+                                            ? undefined
+                                            : productdepth
+                                        }
+                                        position="relative"
+                                        bottom="-40px"
+                                        right="-20px"
+                                        width="200px"
+                                        placeholder="ความลึก (ซม.)"
+                                        focusBorderColor="#0F63E9"
+                                        _hover={{ borderColor: '#0F63E9' }}
+                                        onChange={(e) => {
+                                          setProductdepth(e.target.value);
+                                        }}
+                                      />
+                                      <Input
+                                        readOnly
+                                        htmlSize={32}
+                                        value={
+                                          productsize == -1
+                                            ? undefined
+                                            : productsize
+                                        }
+                                        position="relative"
+                                        bottom="-50px"
+                                        right="-20px"
+                                        width="200px"
+                                        placeholder="ขนาดสินค้า (นิ้ว)"
+                                        focusBorderColor="#0F63E9"
+                                        _hover={{ borderColor: '#0F63E9' }}
+                                        onChange={(e) => {
+                                          setProductsize(e.target.value);
+                                        }}
+                                      />
+                                    </Box>
                                   </Box>
-                                  <Box position="relative" bottom="-20px">
-                                    <Input
-                                      readOnly
-                                      htmlSize={32}
-                                      value={productbrand}
-                                      position="relative"
-                                      right="-20px"
-                                      width="200px"
-                                      placeholder="แบรนด์"
-                                      focusBorderColor="#0F63E9"
-                                      _hover={{ borderColor: '#0F63E9' }}
-                                      onChange={(e) =>
-                                        setProductbrand(e.target.value)
-                                      }
-                                    />
-                                    <Input
-                                      readOnly
-                                      htmlSize={32}
-                                      value={productmainmaterial}
-                                      position="relative"
-                                      bottom="-10px"
-                                      right="-20px"
-                                      width="200px"
-                                      placeholder="วัสดุหลัก"
-                                      focusBorderColor="#0F63E9"
-                                      _hover={{ borderColor: '#0F63E9' }}
-                                      onChange={(e) => {
-                                        setProductmainmateria(e.target.value);
-                                      }}
-                                    />
-                                    <Input
-                                      readOnly
-                                      htmlSize={32}
-                                      value={
-                                        productwidth == -1
-                                          ? undefined
-                                          : productwidth
-                                      }
-                                      position="relative"
-                                      bottom="-20px"
-                                      right="-20px"
-                                      width="200px"
-                                      placeholder="ความสูง (ซม.)"
-                                      focusBorderColor="#0F63E9"
-                                      _hover={{ borderColor: '#0F63E9' }}
-                                      onChange={(e) => {
-                                        setProductwidth(e.target.value);
-                                      }}
-                                    />
-                                    <Input
-                                      readOnly
-                                      htmlSize={32}
-                                      value={
-                                        productheight == -1
-                                          ? undefined
-                                          : productheight
-                                      }
-                                      position="relative"
-                                      bottom="-30px"
-                                      right="-20px"
-                                      width="200px"
-                                      placeholder="ความกว้าง (ซม.)"
-                                      focusBorderColor="#0F63E9"
-                                      _hover={{ borderColor: '#0F63E9' }}
-                                      onChange={(e) => {
-                                        setProductheight(e.target.value);
-                                      }}
-                                    />
-                                    <Input
-                                      readOnly
-                                      htmlSize={32}
-                                      value={
-                                        productdepth == -1
-                                          ? undefined
-                                          : productdepth
-                                      }
-                                      position="relative"
-                                      bottom="-40px"
-                                      right="-20px"
-                                      width="200px"
-                                      placeholder="ความลึก (ซม.)"
-                                      focusBorderColor="#0F63E9"
-                                      _hover={{ borderColor: '#0F63E9' }}
-                                      onChange={(e) => {
-                                        setProductdepth(e.target.value);
-                                      }}
-                                    />
-                                    <Input
-                                      readOnly
-                                      htmlSize={32}
-                                      value={
-                                        productsize == -1
-                                          ? undefined
-                                          : productsize
-                                      }
-                                      position="relative"
-                                      bottom="-50px"
-                                      right="-20px"
-                                      width="200px"
-                                      placeholder="ขนาดสินค้า (นิ้ว)"
-                                      focusBorderColor="#0F63E9"
-                                      _hover={{ borderColor: '#0F63E9' }}
-                                      onChange={(e) => {
-                                        setProductsize(e.target.value);
-                                      }}
-                                    />
-                                  </Box>
-                                </Box>
-                              </Flex>
-                            </ModalBody>
-                            <ModalFooter fontFamily={'Kanit, sans-serif'}>
-                              <Button
-                                onClick={() => deleteProduct(editProduct)}
-                                w="184px"
-                                h="40px"
-                                borderRadius="8px"
-                                bg="#564DE6"
-                                border="none"
-                                p={0}
-                                _hover={{
-                                  bg: '#2C23BF',
-                                  boxShadow: '0 5px 10px rgba(0, 0, 0, .2)',
-                                }}
-                                position="relative"
-                                top="-70px"
-                              >
-                                <Text color="white" fontSize="14">
-                                  ลบ
-                                </Text>
-                              </Button>
-                            </ModalFooter>
-                          </ModalContent>
-                        </Modal>
+                                </Flex>
+                              </ModalBody>
+                              <ModalFooter fontFamily={'Kanit, sans-serif'}>
+                                <Button
+                                  onClick={() =>
+                                    deleteProduct(editProduct?._id)
+                                  }
+                                  w="184px"
+                                  h="40px"
+                                  borderRadius="8px"
+                                  bg="#564DE6"
+                                  border="none"
+                                  p={0}
+                                  _hover={{
+                                    bg: '#2C23BF',
+                                    boxShadow: '0 5px 10px rgba(0, 0, 0, .2)',
+                                  }}
+                                  position="relative"
+                                  top="-70px"
+                                >
+                                  <Text color="white" fontSize="14">
+                                    ลบ
+                                  </Text>
+                                </Button>
+                              </ModalFooter>
+                            </ModalContent>
+                          </Modal>
+                        </Box>
                       </Box>
-                    </Box>
-                  </Flex>
-                </Box>
-              ))}
+                    </Flex>
+                  </Box>
+                ))
+              ) : (
+                <></>
+              )}
             </Box>
 
             {/* สินค้าตามลำดับ  */}
